@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista de formulario de factura con soporte de tarifas -->
+    <record id="view_move_form_pricelist" model="ir.ui.view">
+        <field name="name">account.move.form.pricelist</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Agregar campo de tarifa después de partner_bank_id -->
+            <xpath expr="//field[@name='partner_bank_id']" position="after">
+                <div class="o_td_label" groups="product.group_product_pricelist"
+                     invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <label for="pricelist_id" string="Tarifa"/>
+                </div>
+
+                <div class="d-flex" groups="product.group_product_pricelist"
+                     invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <field name="pricelist_id"
+                        options="{'no_open': True, 'no_create': True}"
+                        readonly="state != 'draft'"/>
+                    <button name="action_update_prices"
+                            type="object"
+                            string=" Actualizar Precios"
+                            help="Recalcular todos los precios basados en la tarifa actual"
+                            class="btn-link mb-1 px-0"
+                            icon="fa-refresh"
+                            confirm="Esto actualizará todos los precios unitarios basados en la tarifa seleccionada."
+                            invisible="state != 'draft'"/>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
