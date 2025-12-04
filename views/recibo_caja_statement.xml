@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Formato de papel para Recibo de Caja -->
+    <record id="paperformat_recibo_caja_statement" model="report.paperformat">
+        <field name="name">Recibo de Caja Statement</field>
+        <field name="default" eval="False"/>
+        <field name="format">Letter</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Template Recibo de Caja para Statement Lines -->
+    <template id="recibo_caja_statement">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang or 'es_GT')" />
+                <div class="page" style="font-family: Arial, sans-serif;">
+                    <!-- Header -->
+                    <div class="row" style="border-bottom: 2px solid rgb(173, 172, 172); padding-bottom: 15px">
+                        <div class="col-2 text-center">
+                            <img style="height: 110px; width: 100%;" t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" alt="Logo" />
+                        </div>
+
+                        <div class="col-5 text-center" style="font-size: 15px">
+                            <span style="font-weight: 600;" class="d-block" t-field="o.company_id.partner_id" />
+                            <span class="d-block" t-field="o.company_id.street" />
+                            <span class="d-block" t-field="o.company_id.street2" />
+                            <span t-field="o.company_id.city" />
+                            <span t-field="o.company_id.country_id" />
+                            <span class="d-block" t-field="o.company_id.phone" />
+                        </div>
+
+                        <div class="col-5 text-center">
+                            <div style="border-radius: 5px; border: 1px solid black;">
+                                <p style="text-transform: uppercase; margin: 0; padding: 0; font-weight: 700;">Recibo de Caja</p>
+                                <span style="color:red; margin-left: 5px;" t-esc="o.ref or o.payment_ref or '-'" />
+                            </div>
+                            <div style="margin-right:15px;">
+                                <div class="row" style="border-top: 1px solid black; border-radius: 5px; font-weight: 700;">
+                                    <div class="col-4" style="border-right: 1px solid black;">Día</div>
+                                    <div class="col-4" style="border-right: 1px solid black;">Mes</div>
+                                    <div class="col-4">Año</div>
+                                </div>
+                                <div class="row" style="border-top: 1px solid black; border-radius: 5px;">
+                                    <div class="col-4" style="border-right: 1px solid black; border-top:1px solid black;">
+                                        <span t-esc="o.date.strftime('%d')" />
+                                    </div>
+                                    <div class="col-4" style="border-right: 1px solid black; border-top:1px solid black;">
+                                        <span t-esc="o.date.strftime('%m')" />
+                                    </div>
+                                    <div class="col-4" style="border-top:1px solid black;">
+                                        <span t-esc="o.date.strftime('%Y')" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div style="border: 2px solid black; margin-top: 10px;">
+                        <div class="d-flex" style="padding: 5px">
+                            <div class="col-6">
+                                <strong style="text-transform: uppercase;">Recibimos de:</strong>
+                                <span style="margin-left: 5px" t-esc="o.partner_id.name" />
+                            </div>
+                            <div class="col-6">
+                                <strong style="text-transform: uppercase;">Referencia:</strong>
+                                <span style="margin-left: 5px; color:red" t-esc="o.ref or o.payment_ref or '-'" />
+                            </div>
+                        </div>
+                        <div style="padding: 5px" class="d-flex">
+                            <div class="col-6">
+                                <strong style="text-transform: uppercase">NIT:</strong>
+                                <span style="margin-left: 5px" t-esc="o.partner_id.vat"/>
+                            </div>
+                            <div class="col-6">
+                                <strong style="text-transform: uppercase">Teléfono:</strong>
+                                <span style="margin-left: 5px" t-esc="o.partner_id.phone"/>
+                            </div>
+                        </div>
+                        <div style="padding: 5px" class="row">
+                            <div class="col-6">
+                                <strong style="text-transform: uppercase">Tipo de Transacción:</strong>
+                                <span t-esc="o.tipo()" />
+                            </div>
+                            <div class="col-6">
+                                <strong style="text-transform: uppercase">Valor:</strong>
+                                <span t-esc="'{:,.2f}'.format(abs(o.amount))" />
+                                <span t-esc="o.currency_id.name" />
+                            </div>
+                        </div>
+
+                        <div class="text-center" style="border-top: 1.5px solid black; border-bottom: 1px solid black; padding: 5px">
+                            <strong style="text-transform: uppercase;">Descripción</strong>
+                        </div>
+
+                        <div class="text-left" style="height: auto; padding: 5px; min-height: 60px;">
+                            <span t-esc="o.payment_ref or o.ref or '-'" />
+                        </div>
+
+                        <div class="text-center" style="border-top: 1px solid black; border-bottom: 1px solid black; text-transform: uppercase; padding: 5px; font-weight: 700">
+                            MEMO
+                        </div>
+                        <div style="padding: 5px; min-height: 40px;">
+                            <t t-if="'narration' in o._fields and o.narration">
+                                <span t-esc="o.narration" />
+                            </t>
+                            <t t-elif="o.move_id and o.move_id.narration">
+                                <span t-esc="o.move_id.narration" />
+                            </t>
+                            <t t-else="">
+                                <span>-</span>
+                            </t>
+                        </div>
+
+                        <div class="text-center" style="border-top: 1px solid black; border-bottom: 1px solid black; text-transform: uppercase; padding: 5px; font-weight: 700">
+                            Detalle Contable
+                        </div>
+                        <div style="padding: 5px;">
+                            <t t-set="cuenta" t-value="o.cuentas_contables()" />
+                            <div class="row" style="font-weight: bold; border-bottom: 1px solid #ccc;">
+                                <div class="col-2">Código</div>
+                                <div class="col-6">Cuenta</div>
+                                <div class="col-2 text-right">Débito</div>
+                                <div class="col-2 text-right">Crédito</div>
+                            </div>
+                            <t t-foreach="cuenta['cuentas']" t-as="c">
+                                <div class="row" style="border-bottom: 1px solid #eee;">
+                                    <div class="col-2"><span t-esc="c[0]" /></div>
+                                    <div class="col-6"><span t-esc="c[1]" /></div>
+                                    <div class="col-2 text-right"><span t-esc="'{:,.2f}'.format(c[2])" /></div>
+                                    <div class="col-2 text-right"><span t-esc="'{:,.2f}'.format(c[3])" /></div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div class="row text-center" style="padding: 5px; border-top: 2px solid black;">
+                            <div class="col-9" style="border-right: 1px solid black; text-align: left;">
+                                <strong>En letras: </strong>
+                                <span t-esc="o.num_a_letras(abs(o.amount))" />
+                            </div>
+                            <div class="col-3">
+                                <span style="font-weight: 700; text-transform:uppercase;">TOTAL: </span>
+                                <span style="margin-left: 3px" t-esc="'{:,.2f}'.format(abs(o.amount))" />
+                                <span t-esc="o.currency_id.name" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer info -->
+                    <div class="row" style="margin-top: 20px; font-size: 12px;">
+                        <div class="col-6">
+                            <strong>Elaborado por:</strong> <span t-esc="o.create_uid.name" />
+                        </div>
+                        <div class="col-6 text-right">
+                            <strong>Fecha de impresión:</strong>
+                            <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M:%S')" />
+                        </div>
+                    </div>
+                </div>
+                <p style="page-break-before:always;" />
+            </t>
+        </t>
+    </template>
+
+    <!-- Reporte Recibo de Caja para Statement Lines -->
+    <record id="recibo_caja_statement_report" model="ir.actions.report">
+        <field name="name">Recibo de Caja</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">adroc_account_move_fixes.recibo_caja_statement</field>
+        <field name="report_file">adroc_account_move_fixes.recibo_caja_statement</field>
+        <field name="paperformat_id" ref="paperformat_recibo_caja_statement" />
+        <field name="binding_model_id" ref="account.model_account_bank_statement_line" />
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

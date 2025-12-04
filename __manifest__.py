@@ -17,10 +17,12 @@
         'product',
         'sale',
         'l10n_gt_extra',
+        'invoice_gt',
     ],
     'data': [
         'views/account_move_views.xml',
         'views/voucher_bi_payment.xml',
+        'views/recibo_caja_statement.xml',
     ],
     'installable': True,
     'application': False,
