@@ -121,6 +121,42 @@
                             </t>
                         </div>
 
+                        <!-- Detalle de Facturas Conciliadas -->
+                        <div class="text-center" style="border-top: 1px solid black; border-bottom: 1px solid black; text-transform: uppercase; padding: 5px; font-weight: 700">
+                            Detalle Factura
+                        </div>
+                        <div style="padding: 5px;">
+                            <t t-set="facturas" t-value="o.get_facturas_conciliadas()" />
+                            <t t-if="facturas">
+                                <div class="row" style="font-weight: bold; border-bottom: 1px solid #ccc;">
+                                    <div class="col-5">Factura</div>
+                                    <div class="col-3 text-right">Total Factura</div>
+                                    <div class="col-2 text-right">Monto Pagado</div>
+                                    <div class="col-2 text-right">Saldo</div>
+                                </div>
+                                <t t-foreach="facturas" t-as="f">
+                                    <div class="row" style="border-bottom: 1px solid #eee;">
+                                        <div class="col-5"><span t-esc="f['name']" /></div>
+                                        <div class="col-3 text-right">
+                                            <span t-esc="'{:,.2f}'.format(f['amount_total'])" />
+                                            <span t-esc="f['currency']" />
+                                        </div>
+                                        <div class="col-2 text-right">
+                                            <span t-esc="'{:,.2f}'.format(f['amount_paid'])" />
+                                        </div>
+                                        <div class="col-2 text-right">
+                                            <span t-esc="'{:,.2f}'.format(f['amount_residual'])" />
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <div class="text-center" style="padding: 10px; color: #666;">
+                                    No hay facturas conciliadas
+                                </div>
+                            </t>
+                        </div>
+
                         <div class="text-center" style="border-top: 1px solid black; border-bottom: 1px solid black; text-transform: uppercase; padding: 5px; font-weight: 700">
                             Detalle Contable
                         </div>
